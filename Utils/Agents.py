@@ -12,17 +12,19 @@ class Agent:
         self.model = ChatOpenAI(temperature=0, model="gpt-4o")
 
     def create_prompt_template(self):
+        """Return a prompt template depending on the agent role."""
         if self.role == "MultidisciplinaryTeam":
-            templates = f"""
+            template = f"""
                 Act like a multidisciplinary team of healthcare professionals.
                 You will receive a medical report of a patient visited by a Cardiologist, Psychologist, and Pulmonologist.
                 Task: Review the patient's medical report from the Cardiologist, Psychologist, and Pulmonologist, analyze them and come up with a list of 3 possible health issues of the patient.
                 Just return a list of bullet points of 3 possible health issues of the patient and for each issue provide the reason.
-                
+
                 Cardiologist Report: {self.extra_info.get('cardiologist_report', '')}
                 Psychologist Report: {self.extra_info.get('psychologist_report', '')}
                 Pulmonologist Report: {self.extra_info.get('pulmonologist_report', '')}
             """
+            return PromptTemplate.from_template(template)
         else:
             templates = {
                 "Cardiologist": """
@@ -50,8 +52,8 @@ class Agent:
                     Patient's Report: {medical_report}
                 """
             }
-        templates = templates[self.role]
-        return PromptTemplate.from_template(templates)
+            template = templates[self.role]
+            return PromptTemplate.from_template(template)
     
     def run(self):
         print(f"{self.role} is running...")
